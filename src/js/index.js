@@ -1,20 +1,28 @@
 require("@babel/polyfill");
 import Search from './model/Search';
+import {elements, renderLoader, clearLoader} from './view/base';
+import * as searchView from './view/searchView';
 
 const state = {};
 
 const controlSearch = async () => {
-    const query = 'pizza';
+    const query = searchView.getInput();
     if(query) {
         state.search = new Search(query);
 
+        searchView.clearSearchQuery();
+        searchView.clearSearchResult();
+        renderLoader(elements.searchResultDiv);
+
         await state.search.doSearch();
 
-        console.log(state.search.result);
+        clearLoader();
+        if(state.search.result === undefined) alert("No result!");
+        else searchView.renderRecipes(state.search.result);
     }
 }
 
-document.querySelector('.search').addEventListener('submit', e => {
+elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
     controlSearch();
 });
